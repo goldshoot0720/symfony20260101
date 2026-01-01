@@ -205,27 +205,23 @@
             <nav>
                 <a href="#" class="nav-item active" data-page="home">
                     <i class="fas fa-home"></i>
-                    內頁
+                    首頁
                 </a>
                 <a href="#" class="nav-item" data-page="dashboard">
                     <i class="fas fa-tachometer-alt"></i>
                     儀表板
                 </a>
-                <a href="#" class="nav-item" data-page="images">
-                    <i class="fas fa-images"></i>
-                    圖片庫
-                </a>
-                <a href="#" class="nav-item" data-page="videos">
-                    <i class="fas fa-video"></i>
-                    影片庫
+                <a href="#" class="nav-item" data-page="foods">
+                    <i class="fas fa-utensils"></i>
+                    食品管理
                 </a>
                 <a href="#" class="nav-item" data-page="subscriptions">
                     <i class="fas fa-calendar-check"></i>
                     訂閱管理
                 </a>
-                <a href="#" class="nav-item" data-page="foods">
-                    <i class="fas fa-utensils"></i>
-                    食品管理
+                <a href="/test.html" class="nav-item">
+                    <i class="fas fa-flask"></i>
+                    系統測試
                 </a>
             </nav>
         </div>
@@ -239,7 +235,7 @@
                             <i class="fas fa-robot" style="color: #ff4757; margin-right: 10px;"></i>
                             鋒兄AI資訊系統
                         </div>
-                        <div class="page-subtitle">智能管理您的影片和圖片收藏，支援智能分類和快速搜尋</div>
+                        <div class="page-subtitle">智能管理您的食品存貨和訂閱服務，支援到期提醒和快速搜尋</div>
                     </div>
                     <div>
                         <span class="status-indicator status-online" id="system-status"></span>
@@ -256,6 +252,16 @@
                     </div>
                     
                     <div class="dashboard-grid">
+                        <div class="card" style="cursor: pointer;" onclick="showPage('foods')">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: #e74c3c;">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="card-title">食品管理</div>
+                            </div>
+                            <p>管理您的食品存貨和到期提醒</p>
+                        </div>
+
                         <div class="card" style="cursor: pointer;" onclick="showPage('subscriptions')">
                             <div class="card-header">
                                 <div class="card-icon" style="background: #3498db;">
@@ -266,34 +272,24 @@
                             <p>管理您的各種訂閱服務和會員資訊</p>
                         </div>
 
-                        <div class="card" style="cursor: pointer;" onclick="showPage('foods')">
-                            <div class="card-header">
-                                <div class="card-icon" style="background: #e74c3c;">
-                                    <i class="fas fa-utensils"></i>
-                                </div>
-                                <div class="card-title">食品管理</div>
-                            </div>
-                            <p>管理您的食品存貨和營養資訊</p>
-                        </div>
-
-                        <div class="card" style="cursor: pointer;" onclick="showPage('images')">
+                        <div class="card" style="cursor: pointer;" onclick="showPage('dashboard')">
                             <div class="card-header">
                                 <div class="card-icon" style="background: #27ae60;">
-                                    <i class="fas fa-images"></i>
+                                    <i class="fas fa-tachometer-alt"></i>
                                 </div>
-                                <div class="card-title">圖片庫</div>
+                                <div class="card-title">系統儀表板</div>
                             </div>
-                            <p>鋒兄的精美圖片收藏庫 AI 創作 (241 張圖片)</p>
+                            <p>查看系統統計和即時狀態</p>
                         </div>
 
-                        <div class="card" style="cursor: pointer;" onclick="showPage('videos')">
+                        <div class="card" style="cursor: pointer;" onclick="window.open('/test.html', '_blank')">
                             <div class="card-header">
                                 <div class="card-icon" style="background: #9b59b6;">
-                                    <i class="fas fa-video"></i>
+                                    <i class="fas fa-flask"></i>
                                 </div>
-                                <div class="card-title">影片庫</div>
+                                <div class="card-title">系統測試</div>
                             </div>
-                            <p>鋒兄的精美人生與紀實庫存</p>
+                            <p>測試系統功能和API狀態</p>
                         </div>
                     </div>
 
@@ -301,17 +297,17 @@
                         <div class="tech-section">
                             <h4><i class="fas fa-cogs"></i> 前端技術</h4>
                             <ul>
-                                <li>SolidJS (SolidStart)</li>
-                                <li>網頁元件 Netlify</li>
-                                <li>響應式設計 + Tailwind CSS</li>
+                                <li>響應式設計</li>
+                                <li>現代化 JavaScript</li>
+                                <li>Font Awesome 圖標</li>
                             </ul>
                         </div>
                         <div class="tech-section">
                             <h4><i class="fas fa-server"></i> 後端技術</h4>
                             <ul>
-                                <li>Strapi CMS</li>
-                                <li>多片存放校 Strapi</li>
-                                <li>RESTful API 支援</li>
+                                <li>PHP + MySQL</li>
+                                <li>RESTful API</li>
+                                <li>僅兩個資料表 (food, subscription)</li>
                             </ul>
                         </div>
                     </div>
@@ -323,8 +319,8 @@
                         <a href="/api/status" class="btn">
                             <i class="fas fa-heartbeat"></i> API 狀態
                         </a>
-                        <a href="/config/init_database.php" class="btn">
-                            <i class="fas fa-database"></i> 數據庫
+                        <a href="/config/database.php" class="btn">
+                            <i class="fas fa-database"></i> 數據庫檢查
                         </a>
                     </div>
 
@@ -343,47 +339,13 @@
                     </div>
                 </div>
                 <div class="card">
-                    <h3>儀表板功能開發中...</h3>
-                    <p>此頁面將顯示系統統計資訊和快速操作選項。</p>
-                </div>
-            </div>
-
-            <div id="images-page" class="page hidden">
-                <div class="header">
-                    <div>
-                        <div class="page-title">鋒兄圖片庫</div>
-                        <div class="page-subtitle">鋒兄的精美圖片收藏庫 AI 創作</div>
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #3498db;">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="card-title">系統統計</div>
                     </div>
-                </div>
-                <div class="card">
-                    <h3>圖片庫功能開發中...</h3>
-                    <p>此頁面將顯示圖片收藏和管理功能。</p>
-                </div>
-            </div>
-
-            <div id="videos-page" class="page hidden">
-                <div class="header">
-                    <div>
-                        <div class="page-title">鋒兄影片庫</div>
-                        <div class="page-subtitle">鋒兄的精美人生與紀實庫存</div>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>影片庫功能開發中...</h3>
-                    <p>此頁面將顯示影片收藏和播放功能。</p>
-                </div>
-            </div>
-
-            <div id="subscriptions-page" class="page hidden">
-                <div class="header">
-                    <div>
-                        <div class="page-title">訂閱管理系統</div>
-                        <div class="page-subtitle">管理您的各種訂閱服務和會員資訊</div>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>訂閱管理功能開發中...</h3>
-                    <p>此頁面將顯示訂閱服務管理和到期提醒功能。</p>
+                    <div id="dashboard-stats">載入中...</div>
                 </div>
             </div>
 
@@ -395,8 +357,31 @@
                     </div>
                 </div>
                 <div class="card">
-                    <h3>食品管理功能開發中...</h3>
-                    <p>此頁面將顯示食品庫存管理和到期提醒功能。</p>
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #e74c3c;">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="card-title">食品列表</div>
+                    </div>
+                    <div id="foods-list">載入中...</div>
+                </div>
+            </div>
+
+            <div id="subscriptions-page" class="page hidden">
+                <div class="header">
+                    <div>
+                        <div class="page-title">訂閱管理系統</div>
+                        <div class="page-subtitle">管理您的各種訂閱服務和會員資訊</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #3498db;">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="card-title">訂閱列表</div>
+                    </div>
+                    <div id="subscriptions-list">載入中...</div>
                 </div>
             </div>
         </div>
@@ -418,18 +403,138 @@
                 targetPage.classList.remove('hidden');
             }
             
-            const targetNav = document.querySelector([data-page="+pageId+"]);
+            const targetNav = document.querySelector(`[data-page="${pageId}"]`);
             if (targetNav) {
                 targetNav.classList.add('active');
             }
+
+            // 載入對應頁面的數據
+            loadPageData(pageId);
+        }
+
+        // 載入頁面數據
+        async function loadPageData(pageId) {
+            if (pageId === 'dashboard') {
+                loadDashboardData();
+            } else if (pageId === 'foods') {
+                loadFoodsData();
+            } else if (pageId === 'subscriptions') {
+                loadSubscriptionsData();
+            }
+        }
+
+        // 載入儀表板數據
+        async function loadDashboardData() {
+            const container = document.getElementById('dashboard-stats');
+            container.innerHTML = '載入中...';
+            
+            try {
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    container.innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #e74c3c;">${data.data.foods.total}</div>
+                                <div>食品總數</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #f39c12;">${data.data.foods.expiring_7_days}</div>
+                                <div>7天內到期</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #3498db;">${data.data.subscriptions.total}</div>
+                                <div>訂閱總數</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #f39c12;">${data.data.subscriptions.expiring_7_days}</div>
+                                <div>7天內到期</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = '載入失敗';
+            }
+        }
+
+        // 載入食品數據
+        async function loadFoodsData() {
+            const container = document.getElementById('foods-list');
+            container.innerHTML = '載入中...';
+            
+            try {
+                const response = await fetch('/api/foods');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const html = data.data.map(food => `
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>${food.name}</strong><br>
+                                    <small>數量: ${food.quantity || food.amount} | 到期: ${food.expiry_date || food.todate}</small>
+                                </div>
+                                <div style="color: ${getStatusColor(food.status)};">
+                                    ${food.status}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    container.innerHTML = html || '暫無數據';
+                }
+            } catch (error) {
+                container.innerHTML = '載入失敗';
+            }
+        }
+
+        // 載入訂閱數據
+        async function loadSubscriptionsData() {
+            const container = document.getElementById('subscriptions-list');
+            container.innerHTML = '載入中...';
+            
+            try {
+                const response = await fetch('/api/subscriptions');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const html = data.data.map(sub => `
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>${sub.name}</strong><br>
+                                    <small>價格: $${sub.price} | 下次付款: ${sub.next_payment_date || sub.nextdate}</small>
+                                </div>
+                                <div style="color: ${getStatusColor(sub.status)};">
+                                    ${sub.status}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    container.innerHTML = html || '暫無數據';
+                }
+            } catch (error) {
+                container.innerHTML = '載入失敗';
+            }
+        }
+
+        // 獲取狀態顏色
+        function getStatusColor(status) {
+            if (status === '新鮮' || status === '正常') return '#27ae60';
+            if (status === '即將到期') return '#f39c12';
+            if (status === '已過期') return '#e74c3c';
+            return '#ffffff';
         }
 
         // 導航點擊事件
-        document.querySelectorAll('.nav-item').forEach(item => {
+        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 const pageId = item.getAttribute('data-page');
-                showPage(pageId);
+                if (pageId) {
+                    showPage(pageId);
+                }
             });
         });
 
@@ -456,7 +561,7 @@
         // 每30秒檢查一次系統狀態
         setInterval(checkSystemStatus, 30000);
 
-        console.log(' 鋒兄AI資訊系統已載入');
+        console.log('🚀 鋒兄AI資訊系統已載入');
     </script>
 </body>
 </html>

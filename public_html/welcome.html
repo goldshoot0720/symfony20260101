@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鋒兄AI資訊系統</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .btn {
+            background: #ff4757;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #ff3742;
+        }
+        .status {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .success { border-left: 4px solid #27ae60; }
+        .error { border-left: 4px solid #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 鋒兄AI資訊系統</h1>
+        <div class="subtitle">智能管理您的食品存貨和訂閱服務，支援到期提醒和快速搜尋</div>
+        
+        <div class="card">
+            <h2>系統功能</h2>
+            <p>• 🍎 食品管理系統 - 管理食品存貨和到期提醒</p>
+            <p>• 📅 訂閱管理系統 - 管理各種訂閱服務和會員資訊</p>
+            <p>• 📊 系統儀表板 - 即時監控和數據統計</p>
+        </div>
+
+        <div class="card">
+            <h2>快速訪問</h2>
+            <a href="/manage.html" class="btn">⚙️ 管理介面</a>
+            <a href="/test.html" class="btn">🧪 系統測試</a>
+            <a href="/api/status" class="btn">📡 API 狀態</a>
+        </div>
+
+        <div class="card">
+            <h2>🚀 啟動說明</h2>
+            <p><strong>1. 啟動伺服器：</strong></p>
+            <p>執行 <code>start_server_fixed.bat</code> 或手動執行：</p>
+            <p><code>php -S localhost:9000 -t public_html router.php</code></p>
+            <p><strong>2. 訪問系統：</strong></p>
+            <p>開啟瀏覽器訪問 <a href="http://localhost:9000" style="color: #ff4757;">http://localhost:9000</a></p>
+        </div>
+
+        <div class="card">
+            <h2>系統狀態檢查</h2>
+            <div id="status-check">
+                <button onclick="checkSystemStatus()" class="btn">🔍 檢查系統狀態</button>
+                <div id="status-results"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>技術架構</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left;">
+                <div>
+                    <h3>前端技術</h3>
+                    <p>• 響應式設計</p>
+                    <p>• 現代化 JavaScript</p>
+                    <p>• Font Awesome 圖標</p>
+                </div>
+                <div>
+                    <h3>後端技術</h3>
+                    <p>• PHP + MySQL</p>
+                    <p>• RESTful API</p>
+                    <p>• 僅兩個資料表 (food, subscription)</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; opacity: 0.7;">
+            <p>鋒兄達智公開資訊 © 版權所有 2025 - 2125</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 鋒兄AI資訊系統已載入');
+        
+        async function checkSystemStatus() {
+            const resultsDiv = document.getElementById('status-results');
+            resultsDiv.innerHTML = '<div class="status">檢查中...</div>';
+            
+            const checks = [
+                { name: 'API 狀態', url: '/api/status' },
+                { name: '食品數據', url: '/api/foods' },
+                { name: '訂閱數據', url: '/api/subscriptions' },
+                { name: '儀表板', url: '/api/dashboard' }
+            ];
+            
+            let results = '';
+            
+            for (const check of checks) {
+                try {
+                    const response = await fetch(check.url);
+                    const data = await response.json();
+                    
+                    if (response.ok && data.status === 'success') {
+                        results += `<div class="status success">✅ ${check.name}: 正常`;
+                        if (data.total !== undefined) {
+                            results += ` (${data.total} 筆記錄)`;
+                        }
+                        results += '</div>';
+                    } else {
+                        results += `<div class="status error">❌ ${check.name}: 錯誤</div>`;
+                    }
+                } catch (error) {
+                    results += `<div class="status error">❌ ${check.name}: 連接失敗</div>`;
+                }
+            }
+            
+            resultsDiv.innerHTML = results;
+        }
+        
+        // 頁面載入時自動檢查狀態
+        window.addEventListener('load', () => {
+            setTimeout(checkSystemStatus, 1000);
+        });
+    </script>
+</body>
+</html>
