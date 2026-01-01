@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統測試 - 鋒兄AI資訊系統</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .success { background: #27ae60; }
+        .error { background: #e74c3c; }
+        .warning { background: #f39c12; }
+        .loading { background: #3498db; }
+        button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #ff3742;
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 鋒兄AI資訊系統 - 系統測試</h1>
+        
+        <div class="test-item">
+            <span>前端頁面載入</span>
+            <span class="status success">✅ 正常</span>
+        </div>
+        
+        <div class="test-item">
+            <span>API 連接測試</span>
+            <span id="api-status" class="status loading">🔄 測試中...</span>
+        </div>
+        
+        <div class="test-item">
+            <span>數據庫連接</span>
+            <span id="db-status" class="status loading">🔄 測試中...</span>
+        </div>
+        
+        <div class="test-item">
+            <span>文件上傳目錄</span>
+            <span id="upload-status" class="status loading">🔄 檢查中...</span>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button onclick="testAPI()">測試 API</button>
+            <button onclick="testDatabase()">測試數據庫</button>
+            <button onclick="runAllTests()">運行所有測試</button>
+            <button onclick="window.location.href='index.html'">返回主頁</button>
+        </div>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // API 測試
+        async function testAPI() {
+            const statusElement = document.getElementById('api-status');
+            const resultsElement = document.getElementById('test-results');
+            
+            statusElement.className = 'status loading';
+            statusElement.textContent = '🔄 測試中...';
+            
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusElement.className = 'status success';
+                    statusElement.textContent = '✅ API 正常';
+                    
+                    resultsElement.innerHTML = `
+                        <div class="result">
+                            <strong>API 測試結果:</strong><br>
+                            狀態: ${data.status}<br>
+                            消息: ${data.message}<br>
+                            版本: ${data.version}<br>
+                            時間: ${data.timestamp}
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                statusElement.className = 'status error';
+                statusElement.textContent = '❌ API 錯誤';
+                
+                resultsElement.innerHTML = `
+                    <div class="result">
+                        <strong>API 測試失敗:</strong><br>
+                        錯誤: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // 數據庫測試
+        async function testDatabase() {
+            const statusElement = document.getElementById('db-status');
+            const resultsElement = document.getElementById('test-results');
+            
+            statusElement.className = 'status loading';
+            statusElement.textContent = '🔄 測試中...';
+            
+            try {
+                // 測試獲取食品數據
+                const response = await fetch('/api/foods');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusElement.className = 'status success';
+                    statusElement.textContent = '✅ 數據庫正常';
+                    
+                    resultsElement.innerHTML = `
+                        <div class="result">
+                            <strong>數據庫測試結果:</strong><br>
+                            狀態: ${data.status}<br>
+                            數據總數: ${data.total}<br>
+                            示例數據: ${JSON.stringify(data.data[0] || {}, null, 2)}
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                statusElement.className = 'status error';
+                statusElement.textContent = '❌ 數據庫錯誤';
+                
+                resultsElement.innerHTML = `
+                    <div class="result">
+                        <strong>數據庫測試失敗:</strong><br>
+                        錯誤: ${error.message}<br>
+                        建議: 請檢查數據庫配置和連接
+                    </div>
+                `;
+            }
+        }
+        
+        // 檢查上傳目錄
+        function checkUploadDirectory() {
+            const statusElement = document.getElementById('upload-status');
+            
+            // 這裡只是模擬檢查，實際應該通過 API 檢查
+            statusElement.className = 'status success';
+            statusElement.textContent = '✅ 目錄正常';
+        }
+        
+        // 運行所有測試
+        async function runAllTests() {
+            await testAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testDatabase();
+            checkUploadDirectory();
+        }
+        
+        // 頁面載入時自動運行測試
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

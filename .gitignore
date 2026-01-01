@@ -1,0 +1,58 @@
+# 環境配置文件
+.env
+.env.local
+.env.production
+
+# 日誌文件
+logs/*.log
+*.log
+
+# 臨時文件
+public_html/storage/temp/*
+public_html/storage/cache/*
+!public_html/storage/temp/.gitkeep
+!public_html/storage/cache/.gitkeep
+
+# 上傳文件
+public_html/uploads/*
+!public_html/uploads/.gitkeep
+
+# 系統文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 備份文件
+*.bak
+*.backup
+*.old
+
+# 數據庫備份
+*.sql
+*.dump
+
+# 編譯文件
+*.compiled
+
+# 依賴文件
+node_modules/
+vendor/
+
+# 統計文件
+stats/2025-*
+stats/icon/
+
+# 錯誤頁面
+document_errors/
+
+# CGI 腳本
+cgi-bin/
+
+# 私有文件
+private/

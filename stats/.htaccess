@@ -1,0 +1,4 @@
+AuthUserFile /home/feng/web/symfony.tpe12thmayor2025to2038.com/stats/.htpasswd
+AuthName "Web Statistics"
+AuthType Basic
+Require valid-user
