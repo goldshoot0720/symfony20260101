@@ -26,15 +26,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 $routes = [
     'GET' => [
         '/status' => 'getStatus',
-        '/videos' => 'getVideos',
-        '/images' => 'getImages',
         '/foods' => 'getFoods',
         '/subscriptions' => 'getSubscriptions',
         '/dashboard' => 'getDashboardStats'
     ],
     'POST' => [
-        '/videos' => 'createVideo',
-        '/images' => 'createImage',
         '/foods' => 'createFood',
         '/subscriptions' => 'createSubscription'
     ]
@@ -60,136 +56,9 @@ function getStatus() {
         'status' => 'success',
         'message' => '鋒兄AI資訊系統 API 運行中',
         'version' => '1.0.0',
-        'timestamp' => date('Y-m-d H:i:s')
+        'timestamp' => date('Y-m-d H:i:s'),
+        'supported_modules' => ['foods', 'subscriptions']
     ]);
-}
-
-function getVideos() {
-    global $db;
-    
-    try {
-        if ($db) {
-            $stmt = $db->query("SELECT * FROM videos ORDER BY created_at DESC");
-            $videos = $stmt->fetchAll();
-        } else {
-            // 如果數據庫未連接，使用模擬數據
-            $videos = [
-                [
-                    'id' => 1,
-                    'title' => '鋒兄的傳奇人生',
-                    'description' => '鋒兄人生紀錄片庫存',
-                    'file_size' => 2109440,
-                    'duration' => '00:45',
-                    'format' => 'MP4',
-                    'created_at' => '2025-01-01'
-                ],
-                [
-                    'id' => 2,
-                    'title' => '鋒兄雜耍Show 🔥',
-                    'description' => '鋒兄精彩表演庫存',
-                    'file_size' => 4415488,
-                    'duration' => '01:23',
-                    'format' => 'MP4',
-                    'created_at' => '2025-01-01'
-                ]
-            ];
-        }
-        
-        // 格式化文件大小
-        foreach ($videos as &$video) {
-            if (isset($video['file_size'])) {
-                $video['size'] = formatFileSize($video['file_size']);
-            }
-        }
-        
-        echo json_encode([
-            'status' => 'success',
-            'data' => $videos,
-            'total' => count($videos)
-        ], JSON_UNESCAPED_UNICODE);
-        
-    } catch(Exception $e) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => '獲取影片數據失敗: ' . $e->getMessage()
-        ], JSON_UNESCAPED_UNICODE);
-    }
-}
-
-function getImages() {
-    global $db;
-    
-    try {
-        if ($db) {
-            $stmt = $db->query("SELECT * FROM images ORDER BY created_at DESC");
-            $images = $stmt->fetchAll();
-            
-            // 獲取統計信息
-            $stats_stmt = $db->query("
-                SELECT 
-                    COUNT(*) as total,
-                    SUM(file_size) as total_size,
-                    SUM(CASE WHEN format = 'PNG' THEN 1 ELSE 0 END) as png_count,
-                    SUM(CASE WHEN format = 'JPG' THEN 1 ELSE 0 END) as jpg_count,
-                    SUM(CASE WHEN format = 'JPEG' THEN 1 ELSE 0 END) as jpeg_count
-                FROM images
-            ");
-            $stats = $stats_stmt->fetch();
-        } else {
-            // 模擬數據
-            $images = [
-                [
-                    'id' => 1,
-                    'filename' => '1761405813-e...',
-                    'format' => 'JPG',
-                    'file_size' => 908288,
-                    'full_name' => '1761405813-eha...',
-                    'created_at' => '2025-01-01'
-                ],
-                [
-                    'id' => 2,
-                    'filename' => '1761405863-3...',
-                    'format' => 'JPG',
-                    'file_size' => 748544,
-                    'full_name' => '1761405863-3ca...',
-                    'created_at' => '2025-01-01'
-                ]
-            ];
-            
-            $stats = [
-                'total' => 241,
-                'total_size' => 656505856,
-                'png_count' => 192,
-                'jpg_count' => 41,
-                'jpeg_count' => 8
-            ];
-        }
-        
-        // 格式化文件大小
-        foreach ($images as &$image) {
-            if (isset($image['file_size'])) {
-                $image['size'] = formatFileSize($image['file_size']);
-            }
-        }
-        
-        echo json_encode([
-            'status' => 'success',
-            'data' => $images,
-            'total' => $stats['total'],
-            'summary' => [
-                'total_size' => formatFileSize($stats['total_size']),
-                'png_count' => $stats['png_count'],
-                'jpg_count' => $stats['jpg_count'],
-                'jpeg_count' => $stats['jpeg_count']
-            ]
-        ], JSON_UNESCAPED_UNICODE);
-        
-    } catch(Exception $e) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => '獲取圖片數據失敗: ' . $e->getMessage()
-        ], JSON_UNESCAPED_UNICODE);
-    }
 }
 
 function getFoods() {
@@ -197,13 +66,40 @@ function getFoods() {
     
     try {
         if ($db) {
-            $stmt = $db->query("
-                SELECT *, 
-                DATEDIFF(expiry_date, CURDATE()) as days_remaining 
-                FROM foods 
-                ORDER BY expiry_date ASC
-            ");
-            $foods = $stmt->fetchAll();
+            // 檢查是否存在 food 表（現有結構）
+            $tables = $db->query("SHOW TABLES LIKE 'food'")->fetchAll();
+            
+            if (count($tables) > 0) {
+                // 使用現有的 food 表結構
+                $stmt = $db->query("
+                    SELECT 
+                        id,
+                        name,
+                        todate as expiry_date,
+                        amount as quantity,
+                        price,
+                        photo,
+                        shop,
+                        DATEDIFF(todate, CURDATE()) as days_remaining,
+                        CASE 
+                            WHEN DATEDIFF(todate, CURDATE()) < 0 THEN '已過期'
+                            WHEN DATEDIFF(todate, CURDATE()) <= 3 THEN '即將到期'
+                            ELSE '新鮮'
+                        END as status
+                    FROM food 
+                    ORDER BY todate ASC
+                ");
+                $foods = $stmt->fetchAll();
+            } else {
+                // 使用新的 foods 表結構
+                $stmt = $db->query("
+                    SELECT *, 
+                    DATEDIFF(expiry_date, CURDATE()) as days_remaining 
+                    FROM foods 
+                    ORDER BY expiry_date ASC
+                ");
+                $foods = $stmt->fetchAll();
+            }
         } else {
             // 模擬數據
             $foods = [
@@ -214,16 +110,18 @@ function getFoods() {
                     'price' => 0,
                     'expiry_date' => '2026-01-06',
                     'days_remaining' => 15,
-                    'status' => '新鮮'
+                    'status' => '新鮮',
+                    'photo' => 'https://img.pchome.com.tw/cs/items/DBACC4A90089CJA/000001_1689668194.jpg'
                 ],
                 [
                     'id' => 2,
                     'name' => '【張君雅】日式串燒休閒丸子',
                     'quantity' => 6,
                     'price' => 0,
-                    'expiry_date' => '2025-01-07',
+                    'expiry_date' => '2026-01-07',
                     'days_remaining' => 16,
-                    'status' => '新鮮'
+                    'status' => '新鮮',
+                    'photo' => 'https://online.carrefour.com.tw/on/demandware.static/-/Sites-carrefour-tw-m-inner/default/dwd792433f/images/large/0246532.jpeg'
                 ]
             ];
         }
@@ -247,32 +145,59 @@ function getSubscriptions() {
     
     try {
         if ($db) {
-            $stmt = $db->query("
-                SELECT *, 
-                DATEDIFF(next_payment_date, CURDATE()) as days_remaining 
-                FROM subscriptions 
-                ORDER BY next_payment_date ASC
-            ");
-            $subscriptions = $stmt->fetchAll();
+            // 檢查是否存在 subscription 表（現有結構）
+            $tables = $db->query("SHOW TABLES LIKE 'subscription'")->fetchAll();
+            
+            if (count($tables) > 0) {
+                // 使用現有的 subscription 表結構
+                $stmt = $db->query("
+                    SELECT 
+                        id,
+                        name,
+                        nextdate as next_payment_date,
+                        price,
+                        site as service_url,
+                        note,
+                        account,
+                        DATEDIFF(nextdate, CURDATE()) as days_remaining,
+                        CASE 
+                            WHEN DATEDIFF(nextdate, CURDATE()) < 0 THEN '已過期'
+                            WHEN DATEDIFF(nextdate, CURDATE()) <= 7 THEN '即將到期'
+                            ELSE '正常'
+                        END as status
+                    FROM subscription 
+                    ORDER BY nextdate ASC
+                ");
+                $subscriptions = $stmt->fetchAll();
+            } else {
+                // 使用新的 subscriptions 表結構
+                $stmt = $db->query("
+                    SELECT *, 
+                    DATEDIFF(next_payment_date, CURDATE()) as days_remaining 
+                    FROM subscriptions 
+                    ORDER BY next_payment_date ASC
+                ");
+                $subscriptions = $stmt->fetchAll();
+            }
         } else {
             // 模擬數據
             $subscriptions = [
                 [
                     'id' => 1,
-                    'name' => '天虎/黃信訊/心臟內科',
-                    'service_url' => 'https://www.tcmg.com.tw/index.php/main/schedule_time?id=18',
-                    'price' => 530,
-                    'next_payment_date' => '2025-12-26',
-                    'days_remaining' => 25,
-                    'status' => '即將到期'
-                ],
-                [
-                    'id' => 2,
                     'name' => 'kiro pro',
-                    'service_url' => 'https://app.kiro.dev/account/',
+                    'service_url' => 'https://app.kiro.dev/account/usage',
                     'price' => 640,
                     'next_payment_date' => '2026-01-01',
                     'days_remaining' => 10,
+                    'status' => '正常'
+                ],
+                [
+                    'id' => 2,
+                    'name' => '自然輸入法/ 已經取消訂閱。',
+                    'service_url' => 'https://service.iqt.ai/AccountInfo',
+                    'price' => 129,
+                    'next_payment_date' => '2026-01-03',
+                    'days_remaining' => 12,
                     'status' => '正常'
                 ]
             ];
@@ -292,48 +217,96 @@ function getSubscriptions() {
     }
 }
 
-function createVideo() {
-    $input = json_decode(file_get_contents('php://input'), true);
-    
-    // 這裡應該處理文件上傳和數據庫插入
-    echo json_encode([
-        'status' => 'success',
-        'message' => '影片上傳功能開發中',
-        'data' => $input
-    ]);
-}
-
-function createImage() {
-    $input = json_decode(file_get_contents('php://input'), true);
-    
-    // 這裡應該處理文件上傳和數據庫插入
-    echo json_encode([
-        'status' => 'success',
-        'message' => '圖片上傳功能開發中',
-        'data' => $input
-    ]);
-}
-
 function createFood() {
+    global $db;
     $input = json_decode(file_get_contents('php://input'), true);
     
-    // 這裡應該處理數據庫插入
-    echo json_encode([
-        'status' => 'success',
-        'message' => '食品新增功能開發中',
-        'data' => $input
-    ]);
+    try {
+        if ($db) {
+            // 檢查是否存在 food 表
+            $tables = $db->query("SHOW TABLES LIKE 'food'")->fetchAll();
+            
+            if (count($tables) > 0) {
+                // 使用現有的 food 表結構
+                $stmt = $db->prepare("INSERT INTO food (name, todate, amount, price, photo, shop) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $input['name'] ?? '',
+                    $input['expiry_date'] ?? null,
+                    $input['quantity'] ?? 1,
+                    $input['price'] ?? 0,
+                    $input['photo'] ?? '',
+                    $input['shop'] ?? ''
+                ]);
+                
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => '食品新增成功',
+                    'id' => $db->lastInsertId()
+                ], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'food 表不存在'
+                ], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => '數據庫連接失敗'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    } catch(Exception $e) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => '新增食品失敗: ' . $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
+    }
 }
 
 function createSubscription() {
+    global $db;
     $input = json_decode(file_get_contents('php://input'), true);
     
-    // 這裡應該處理數據庫插入
-    echo json_encode([
-        'status' => 'success',
-        'message' => '訂閱新增功能開發中',
-        'data' => $input
-    ]);
+    try {
+        if ($db) {
+            // 檢查是否存在 subscription 表
+            $tables = $db->query("SHOW TABLES LIKE 'subscription'")->fetchAll();
+            
+            if (count($tables) > 0) {
+                // 使用現有的 subscription 表結構
+                $stmt = $db->prepare("INSERT INTO subscription (name, nextdate, price, site, note, account) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $input['name'] ?? '',
+                    $input['next_payment_date'] ?? null,
+                    $input['price'] ?? 0,
+                    $input['service_url'] ?? '',
+                    $input['note'] ?? '',
+                    $input['account'] ?? ''
+                ]);
+                
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => '訂閱新增成功',
+                    'id' => $db->lastInsertId()
+                ], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'subscription 表不存在'
+                ], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => '數據庫連接失敗'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    } catch(Exception $e) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => '新增訂閱失敗: ' . $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
+    }
 }
 
 function getDashboardStats() {
@@ -341,43 +314,46 @@ function getDashboardStats() {
     
     try {
         if ($db) {
+            // 檢查現有表結構
+            $tables = $db->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
+            
             // 獲取訂閱統計
-            $sub_stmt = $db->query("
-                SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN DATEDIFF(next_payment_date, CURDATE()) <= 3 THEN 1 ELSE 0 END) as expiring_3_days,
-                    SUM(CASE WHEN DATEDIFF(next_payment_date, CURDATE()) <= 7 THEN 1 ELSE 0 END) as expiring_7_days,
-                    SUM(CASE WHEN next_payment_date < CURDATE() THEN 1 ELSE 0 END) as expired
-                FROM subscriptions
-            ");
-            $sub_stats = $sub_stmt->fetch();
+            if (in_array('subscription', $tables)) {
+                // 使用現有的 subscription 表
+                $sub_stmt = $db->query("
+                    SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN DATEDIFF(nextdate, CURDATE()) <= 3 THEN 1 ELSE 0 END) as expiring_3_days,
+                        SUM(CASE WHEN DATEDIFF(nextdate, CURDATE()) <= 7 THEN 1 ELSE 0 END) as expiring_7_days,
+                        SUM(CASE WHEN nextdate < CURDATE() THEN 1 ELSE 0 END) as expired
+                    FROM subscription
+                ");
+                $sub_stats = $sub_stmt->fetch();
+            } else {
+                $sub_stats = ['total' => 0, 'expiring_3_days' => 0, 'expiring_7_days' => 0, 'expired' => 0];
+            }
             
             // 獲取食品統計
-            $food_stmt = $db->query("
-                SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN DATEDIFF(expiry_date, CURDATE()) <= 3 THEN 1 ELSE 0 END) as expiring_3_days,
-                    SUM(CASE WHEN DATEDIFF(expiry_date, CURDATE()) <= 7 THEN 1 ELSE 0 END) as expiring_7_days,
-                    SUM(CASE WHEN DATEDIFF(expiry_date, CURDATE()) <= 30 THEN 1 ELSE 0 END) as expiring_30_days,
-                    SUM(CASE WHEN expiry_date < CURDATE() THEN 1 ELSE 0 END) as expired
-                FROM foods
-            ");
-            $food_stats = $food_stmt->fetch();
-            
-            // 獲取圖片統計
-            $img_stmt = $db->query("SELECT COUNT(*) as total, SUM(file_size) as total_size FROM images");
-            $img_stats = $img_stmt->fetch();
-            
-            // 獲取影片統計
-            $vid_stmt = $db->query("SELECT COUNT(*) as total, SUM(file_size) as total_size FROM videos");
-            $vid_stats = $vid_stmt->fetch();
+            if (in_array('food', $tables)) {
+                // 使用現有的 food 表
+                $food_stmt = $db->query("
+                    SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN DATEDIFF(todate, CURDATE()) <= 3 THEN 1 ELSE 0 END) as expiring_3_days,
+                        SUM(CASE WHEN DATEDIFF(todate, CURDATE()) <= 7 THEN 1 ELSE 0 END) as expiring_7_days,
+                        SUM(CASE WHEN DATEDIFF(todate, CURDATE()) <= 30 THEN 1 ELSE 0 END) as expiring_30_days,
+                        SUM(CASE WHEN todate < CURDATE() THEN 1 ELSE 0 END) as expired
+                    FROM food
+                ");
+                $food_stats = $food_stmt->fetch();
+            } else {
+                $food_stats = ['total' => 0, 'expiring_3_days' => 0, 'expiring_7_days' => 0, 'expiring_30_days' => 0, 'expired' => 0];
+            }
             
         } else {
             // 模擬數據
-            $sub_stats = ['total' => 24, 'expiring_3_days' => 0, 'expiring_7_days' => 1, 'expired' => 0];
-            $food_stats = ['total' => 13, 'expiring_3_days' => 0, 'expiring_7_days' => 0, 'expiring_30_days' => 2, 'expired' => 0];
-            $img_stats = ['total' => 241, 'total_size' => 656505856];
-            $vid_stats = ['total' => 2, 'total_size' => 6524928];
+            $sub_stats = ['total' => 2, 'expiring_3_days' => 0, 'expiring_7_days' => 0, 'expired' => 0];
+            $food_stats = ['total' => 2, 'expiring_3_days' => 0, 'expiring_7_days' => 0, 'expiring_30_days' => 0, 'expired' => 0];
         }
         
         $stats = [
@@ -393,14 +369,6 @@ function getDashboardStats() {
                 'expiring_7_days' => (int)$food_stats['expiring_7_days'],
                 'expiring_30_days' => (int)$food_stats['expiring_30_days'],
                 'expired' => (int)$food_stats['expired']
-            ],
-            'images' => [
-                'total' => (int)$img_stats['total'],
-                'total_size' => formatFileSize($img_stats['total_size'])
-            ],
-            'videos' => [
-                'total' => (int)$vid_stats['total'],
-                'total_size' => formatFileSize($vid_stats['total_size'])
             ]
         ];
         

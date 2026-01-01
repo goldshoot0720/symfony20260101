@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理介面 - 鋒兄AI資訊系統</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .nav button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .nav button:hover, .nav button.active {
+            background: #ff4757;
+        }
+        .section {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .section.active {
+            display: block;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff4757;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .data-table th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .status-fresh { color: #27ae60; }
+        .status-expiring { color: #f39c12; }
+        .status-expired { color: #e74c3c; }
+        .btn {
+            background: #ff4757;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #ff3742;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ 鋒兄AI資訊系統 - 管理介面</h1>
+            <p>管理您的食品存貨和訂閱服務</p>
+        </div>
+
+        <div class="nav">
+            <button onclick="showSection('dashboard')" class="active">📊 儀表板</button>
+            <button onclick="showSection('foods')">🍎 食品管理</button>
+            <button onclick="showSection('subscriptions')">📅 訂閱管理</button>
+            <button onclick="window.location.href='index.html'">🏠 返回主頁</button>
+        </div>
+
+        <!-- 儀表板 -->
+        <div id="dashboard" class="section active">
+            <h2>📊 系統儀表板</h2>
+            <div class="stats" id="dashboard-stats">
+                <div class="loading">載入中...</div>
+            </div>
+        </div>
+
+        <!-- 食品管理 -->
+        <div id="foods" class="section">
+            <h2>🍎 食品管理</h2>
+            <div class="loading" id="foods-loading">載入中...</div>
+            <div id="foods-content" style="display: none;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>名稱</th>
+                            <th>數量</th>
+                            <th>到期日</th>
+                            <th>狀態</th>
+                            <th>剩餘天數</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="foods-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 訂閱管理 -->
+        <div id="subscriptions" class="section">
+            <h2>📅 訂閱管理</h2>
+            <div class="loading" id="subscriptions-loading">載入中...</div>
+            <div id="subscriptions-content" style="display: none;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>服務名稱</th>
+                            <th>價格</th>
+                            <th>下次付款</th>
+                            <th>狀態</th>
+                            <th>剩餘天數</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subscriptions-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 'dashboard';
+
+        function showSection(sectionName) {
+            // 隱藏所有區塊
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 移除所有按鈕的 active 狀態
+            document.querySelectorAll('.nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 顯示選中的區塊
+            document.getElementById(sectionName).classList.add('active');
+            event.target.classList.add('active');
+            
+            currentSection = sectionName;
+            
+            // 載入對應數據
+            if (sectionName === 'dashboard') {
+                loadDashboard();
+            } else if (sectionName === 'foods') {
+                loadFoods();
+            } else if (sectionName === 'subscriptions') {
+                loadSubscriptions();
+            }
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const statsHtml = `
+                        <div class="stat-card">
+                            <div class="stat-number">${data.data.foods.total}</div>
+                            <div>食品總數</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.data.foods.expiring_7_days}</div>
+                            <div>7天內到期</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.data.subscriptions.total}</div>
+                            <div>訂閱總數</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.data.subscriptions.expiring_7_days}</div>
+                            <div>7天內到期</div>
+                        </div>
+                    `;
+                    document.getElementById('dashboard-stats').innerHTML = statsHtml;
+                }
+            } catch (error) {
+                document.getElementById('dashboard-stats').innerHTML = '<div class="stat-card">載入失敗</div>';
+            }
+        }
+
+        async function loadFoods() {
+            const loading = document.getElementById('foods-loading');
+            const content = document.getElementById('foods-content');
+            
+            try {
+                const response = await fetch('/api/foods');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const tableHtml = data.data.map(food => `
+                        <tr>
+                            <td>${food.name}</td>
+                            <td>${food.quantity || food.amount}</td>
+                            <td>${food.expiry_date || food.todate}</td>
+                            <td class="status-${getStatusClass(food.status)}">${food.status}</td>
+                            <td>${food.days_remaining}天</td>
+                            <td>
+                                <button class="btn" onclick="editFood(${food.id})">編輯</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                    
+                    document.getElementById('foods-table').innerHTML = tableHtml;
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                }
+            } catch (error) {
+                loading.innerHTML = '載入失敗';
+            }
+        }
+
+        async function loadSubscriptions() {
+            const loading = document.getElementById('subscriptions-loading');
+            const content = document.getElementById('subscriptions-content');
+            
+            try {
+                const response = await fetch('/api/subscriptions');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const tableHtml = data.data.map(sub => `
+                        <tr>
+                            <td>${sub.name}</td>
+                            <td>$${sub.price}</td>
+                            <td>${sub.next_payment_date || sub.nextdate}</td>
+                            <td class="status-${getStatusClass(sub.status)}">${sub.status}</td>
+                            <td>${sub.days_remaining}天</td>
+                            <td>
+                                <button class="btn" onclick="editSubscription(${sub.id})">編輯</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                    
+                    document.getElementById('subscriptions-table').innerHTML = tableHtml;
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                }
+            } catch (error) {
+                loading.innerHTML = '載入失敗';
+            }
+        }
+
+        function getStatusClass(status) {
+            if (status === '新鮮' || status === '正常') return 'fresh';
+            if (status === '即將到期') return 'expiring';
+            if (status === '已過期') return 'expired';
+            return 'fresh';
+        }
+
+        function editFood(id) {
+            alert(`編輯食品 ID: ${id} (功能開發中)`);
+        }
+
+        function editSubscription(id) {
+            alert(`編輯訂閱 ID: ${id} (功能開發中)`);
+        }
+
+        // 頁面載入時自動載入儀表板
+        window.addEventListener('load', () => {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

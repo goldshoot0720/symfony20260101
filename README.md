@@ -1,200 +1,177 @@
 # 鋒兄AI資訊系統
 
-智能管理您的影片和圖片收藏，支援智能分類和快速搜尋的現代化資訊管理系統。
+一個專為管理食品存貨和訂閱服務而設計的智能資訊管理系統。
 
-## 🚀 功能特色
+## 🚀 系統特色
 
-### 核心模組
-- **🎬 影片庫管理** - 鋒兄的精美人生與紀實庫存
-- **🖼️ 圖片庫管理** - 鋒兄的精美圖片收藏庫 AI 創作 (241 張圖片)
-- **🍎 食品管理系統** - 管理您的食品存貨和到期資訊
-- **📅 訂閱管理系統** - 管理您的各種訂閱服務和會員資訊
-- **📊 系統儀表板** - 即時監控和管理各項資訊
+- **🍎 食品管理** - 智能追蹤食品存貨、到期日提醒
+- **📅 訂閱管理** - 管理各種訂閱服務和付款提醒  
+- **📊 智能儀表板** - 即時統計和狀態監控
+- **🎨 響應式設計** - 支援桌面和行動裝置
+- **⚡ 高效能API** - RESTful API 架構
 
-### 技術特色
-- 響應式設計，支援各種設備
-- 現代化的用戶界面
-- RESTful API 架構
-- 智能搜索和分類
-- 自動到期提醒
-- 安全的文件上傳
+## 📋 系統需求
 
-## 🛠️ 技術架構
+- PHP 8.0+
+- MySQL 5.7+
+- Apache/Nginx Web Server
+- 現代瀏覽器支援
 
-### 前端技術
-- **SolidJS (SolidStart)** - 現代化前端框架
-- **Netlify** - 網頁元件部署
-- **Tailwind CSS** - 響應式設計框架
-- **Font Awesome** - 圖標庫
+## 🛠️ 安裝說明
 
-### 後端技術
-- **PHP** - 服務器端語言
-- **MySQL** - 數據庫
-- **Strapi CMS** - 內容管理系統
-- **RESTful API** - API 架構
+### 1. 環境配置
 
-### 部署環境
-- **Apache** - Web 服務器
-- **Hestia Control Panel** - 服務器管理
-- **Linux** - 操作系統
+```bash
+# 複製環境配置檔案
+cp public_html/.env.example public_html/.env
 
-## 📁 項目結構
-
-```
-feng_ai_system/
-├── public_html/                 # 公開網站根目錄
-│   ├── index.html              # 主頁面
-│   ├── api/                    # API 端點
-│   │   └── index.php          # API 路由處理
-│   ├── config/                 # 配置文件
-│   │   └── database.php       # 數據庫配置
-│   ├── uploads/               # 文件上傳目錄
-│   ├── storage/               # 存儲目錄
-│   ├── .htaccess             # Apache 配置
-│   └── robots.txt            # SEO 配置
-├── logs/                      # 日誌文件
-├── stats/                     # 統計分析
-├── private/                   # 私有文件
-└── README.md                  # 項目說明
+# 編輯數據庫配置
+# 本地測試: localhost/root/空白密碼
+# 遠端部署: localhost/feng_laravel/ym0Tagood129
 ```
 
-## 🚀 快速開始
+### 2. 數據庫設置
 
-### 環境要求
-- PHP 7.4 或更高版本
-- MySQL 5.7 或更高版本
-- Apache Web 服務器
-- 支援 mod_rewrite
+```bash
+# 創建數據庫
+CREATE DATABASE feng_symfony;
 
-### 安裝步驟
+# 執行數據庫初始化
+php public_html/config/create_required_tables.php
+```
 
-1. **克隆項目**
-   ```bash
-   git clone https://github.com/your-username/feng-ai-system.git
-   cd feng-ai-system
-   ```
+### 3. 啟動系統
 
-2. **配置環境**
-   ```bash
-   cp public_html/.env.example public_html/.env
-   # 編輯 .env 文件，設置數據庫連接等配置
-   ```
+```bash
+# 本地開發伺服器
+php -S localhost:8080 -t public_html
 
-3. **初始化數據庫**
-   ```bash
-   # 訪問以下 URL 來創建數據庫表
-   https://your-domain.com/config/database.php
-   ```
+# 或使用 Apache/Nginx 指向 public_html 目錄
+```
 
-4. **設置文件權限**
-   ```bash
-   chmod 755 public_html/
-   chmod 777 public_html/uploads/
-   chmod 777 public_html/storage/
-   chmod 777 logs/
-   ```
+## 📁 專案結構
 
-5. **配置 Apache**
-   確保啟用了 mod_rewrite 模組，並且 .htaccess 文件生效。
+```
+feng_symfony/
+├── public_html/           # Web 根目錄
+│   ├── index.html        # 主頁面
+│   ├── manage.html       # 管理介面
+│   ├── test.html         # 系統測試
+│   ├── api/              # API 端點
+│   │   └── index.php     # RESTful API
+│   ├── config/           # 配置檔案
+│   │   ├── database.php  # 數據庫配置
+│   │   └── *.php         # 其他配置
+│   └── .env              # 環境變數
+├── logs/                 # 系統日誌
+└── README.md            # 說明文件
+```
 
-## 📊 API 端點
-
-### 系統狀態
-- `GET /api/status` - 獲取系統狀態
-
-### 影片管理
-- `GET /api/videos` - 獲取影片列表
-- `POST /api/videos` - 上傳新影片
-
-### 圖片管理
-- `GET /api/images` - 獲取圖片列表
-- `POST /api/images` - 上傳新圖片
+## 🔧 API 端點
 
 ### 食品管理
 - `GET /api/foods` - 獲取食品列表
-- `POST /api/foods` - 添加新食品
+- `POST /api/foods` - 新增食品
 
-### 訂閱管理
+### 訂閱管理  
 - `GET /api/subscriptions` - 獲取訂閱列表
-- `POST /api/subscriptions` - 添加新訂閱
+- `POST /api/subscriptions` - 新增訂閱
 
-## 🗄️ 數據庫結構
+### 系統狀態
+- `GET /api/status` - API 狀態檢查
+- `GET /api/dashboard` - 儀表板統計
 
-### 主要數據表
-- `users` - 用戶表
-- `videos` - 影片表
-- `images` - 圖片表
-- `foods` - 食品表
-- `subscriptions` - 訂閱表
-- `payments` - 支付記錄表
+## 🗄️ 資料庫結構
 
-## 🔧 配置說明
+### food 表
+```sql
+CREATE TABLE `food` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` text,
+  `todate` date DEFAULT NULL,
+  `amount` int DEFAULT NULL,
+  `photo` text,
+  `price` int DEFAULT NULL,
+  `shop` text,
+  `photohash` text,
+  PRIMARY KEY (`id`)
+);
+```
 
-### 環境變量
-詳見 `.env.example` 文件中的配置選項。
+### subscription 表
+```sql
+CREATE TABLE `subscription` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` text,
+  `nextdate` date DEFAULT NULL,
+  `price` int DEFAULT NULL,
+  `site` text,
+  `note` text,
+  `account` text,
+  PRIMARY KEY (`id`)
+);
+```
 
-### 文件上傳
-- 支援的圖片格式：JPG, JPEG, PNG, GIF, WebP
-- 支援的影片格式：MP4, AVI, MOV, WMV, FLV
-- 最大文件大小：50MB（可配置）
+## 🧪 測試
 
-### 安全設置
-- CORS 跨域支援
-- 文件類型驗證
-- SQL 注入防護
-- XSS 攻擊防護
+```bash
+# 檢查數據庫連接
+php public_html/config/database.php
 
-## 📱 功能截圖
+# 系統測試頁面
+http://localhost:8080/test.html
 
-### 系統首頁
-- 現代化的用戶界面
-- 功能模組快速訪問
-- 技術架構展示
+# 管理介面
+http://localhost:8080/manage.html
+```
 
-### 儀表板
-- 實時統計數據
-- 到期提醒
-- 快速操作
+## 🚀 部署
 
-### 管理模組
-- 影片庫管理
-- 圖片庫管理
-- 食品管理
-- 訂閱管理
+### 本地測試
+```bash
+# 使用內建伺服器
+php -S localhost:8080 -t public_html
+```
 
-## 🔄 更新日誌
+### 生產環境
+1. 上傳檔案到伺服器
+2. 設定 Web 伺服器指向 `public_html` 目錄
+3. 配置數據庫連接
+4. 執行數據庫初始化
+
+## 📊 功能特色
+
+- ✅ 食品到期提醒 (3天、7天、30天)
+- ✅ 訂閱付款提醒 (3天、7天內到期)
+- ✅ 響應式管理介面
+- ✅ RESTful API 架構
+- ✅ 數據庫自動檢查和修復
+- ✅ 環境配置管理
+
+## 🔒 安全性
+
+- 環境變數配置
+- SQL 注入防護 (PDO Prepared Statements)
+- CORS 跨域請求控制
+- 輸入驗證和清理
+
+## 📝 更新日誌
 
 ### v1.0.0 (2025-01-01)
-- 初始版本發布
-- 基礎功能模組實現
-- API 架構建立
-- 數據庫結構設計
+- ✅ 完成食品和訂閱管理核心功能
+- ✅ 實現響應式管理介面
+- ✅ 建立 RESTful API 架構
+- ✅ 數據庫結構優化 (僅保留必要的兩個表)
+- ✅ 系統測試和部署工具
 
-## 🤝 貢獻指南
+## 🤝 貢獻
 
-歡迎提交 Issue 和 Pull Request 來改進這個項目。
+歡迎提交 Issue 和 Pull Request 來改善系統功能。
 
-### 開發流程
-1. Fork 項目
-2. 創建功能分支
-3. 提交更改
-4. 推送到分支
-5. 創建 Pull Request
+## 📄 授權
 
-## 📄 許可證
-
-本項目採用 MIT 許可證。詳見 [LICENSE](LICENSE) 文件。
-
-## 📞 聯繫方式
-
-- **項目作者**: 鋒兄
-- **網站**: https://symfony.tpe12thmayor2025to2038.com
-- **版權**: 鋒兄達智公開資訊 © 2025 - 2125
-
-## 🙏 致謝
-
-感謝所有為這個項目做出貢獻的開發者和用戶。
+MIT License - 詳見 [LICENSE](LICENSE) 檔案
 
 ---
 
-**鋒兄AI資訊系統** - 智能管理您的數字生活 🚀
+**鋒兄達智公開資訊 © 版權所有 2025 - 2125**
